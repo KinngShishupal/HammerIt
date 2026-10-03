@@ -2,7 +2,6 @@ import { useEffect, useMemo, useReducer, useRef } from 'react';
 import {
   GAME_DURATION_MS,
   HOLE_COOLDOWN_MS,
-  HOLE_COUNT,
   HamsterKind,
   MAX_LIVES,
   POINTS,
@@ -44,20 +43,20 @@ export type WhackResult =
 
 type Timer = ReturnType<typeof setTimeout>;
 
-const emptyHoles = (): HoleState[] =>
-  Array.from({ length: HOLE_COUNT }, () => ({
+const emptyHoles = (count: number): HoleState[] =>
+  Array.from({ length: count }, () => ({
     kind: null,
     spawnId: 0,
     hit: false,
   }));
 
-const createState = () => ({
+const createState = (holeCount: number) => ({
   running: false,
   ending: false,
   startedAt: 0,
   timeLeft: GAME_DURATION_MS,
-  holes: emptyHoles(),
-  cooldownUntil: new Array<number>(HOLE_COUNT).fill(0),
+  holes: emptyHoles(holeCount),
+  cooldownUntil: new Array<number>(holeCount).fill(0),
   score: 0,
   combo: 0,
   bestCombo: 0,
@@ -76,8 +75,10 @@ const createState = () => ({
  */
 export function useGameEngine(
   onEnd: (reason: EndReason, stats: GameStats) => void,
+  holeCount: number,
 ) {
-  const g = useRef(createState());
+  const g = useRef(createState(holeCount));
+  const holeCountRef = useRef(holeCount);
   const [, render] = useReducer((x: number) => x + 1, 0);
   const onEndRef = useRef(onEnd);
 
@@ -207,7 +208,7 @@ export function useGameEngine(
     return {
       start() {
         clearAll();
-        g.current = createState();
+        g.current = createState(holeCountRef.current);
         g.current.running = true;
         g.current.startedAt = Date.now();
         ticker = setInterval(() => {

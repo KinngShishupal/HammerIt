@@ -6,8 +6,8 @@ export type FxKind = 'hit' | 'golden' | 'miss' | 'bomb';
 export type Fx = { id: number; x: number; y: number; kind: FxKind; label: string };
 
 const PALETTE: Record<FxKind, { ring: string; dots: string[]; text: string; size: number }> = {
-  hit: { ring: colors.neonCyan, dots: ['#ffffff', colors.neonCyan, colors.neonPink], text: '#ffffff', size: 1 },
-  golden: { ring: colors.gold, dots: ['#fff3a0', colors.gold, '#ff9f1c'], text: colors.gold, size: 1.35 },
+  hit: { ring: colors.neonCyan, dots: ['#ffffff', colors.neonCyan, colors.neonPink], text: '#ff3fcf', size: 1 },
+  golden: { ring: colors.gold, dots: ['#fff3a0', colors.gold, '#ff9f1c'], text: '#ff9f1c', size: 1.35 },
   bomb: { ring: '#ff9f1c', dots: ['#ffd23f', '#ff9f1c', colors.danger, '#3a3b45'], text: colors.danger, size: 1.8 },
   miss: { ring: 'rgba(255,255,255,0.5)', dots: ['rgba(210,180,140,0.9)', 'rgba(160,120,80,0.9)'], text: 'rgba(255,255,255,0.8)', size: 0.6 },
 };
@@ -40,6 +40,7 @@ const FxItem = memo(function FxItem({ fx, onDone }: { fx: Fx; onDone: (id: numbe
   }, [fx.id, fx.kind, onDone, t]);
 
   const ring = 70 * p.size;
+  const burst = 64 * p.size;
 
   return (
     <View pointerEvents="none" style={[styles.anchor, { left: fx.x, top: fx.y }]}>
@@ -105,12 +106,46 @@ const FxItem = memo(function FxItem({ fx, onDone }: { fx: Fx; onDone: (id: numbe
           ]}
         />
       ))}
+      {(fx.kind === 'hit' || fx.kind === 'golden') && (
+        <Animated.View
+          style={[
+            styles.abs,
+            {
+              left: -burst / 2,
+              top: -burst / 2 - 20,
+              width: burst,
+              height: burst,
+              opacity: t.interpolate({ inputRange: [0, 0.35, 0.55], outputRange: [1, 1, 0], extrapolate: 'clamp' }),
+              transform: [
+                { scale: t.interpolate({ inputRange: [0, 0.12, 0.55], outputRange: [0.2, 1.1, 0.9], extrapolate: 'clamp' }) },
+                { rotate: t.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '40deg'] }) },
+              ],
+            },
+          ]}
+        >
+          {['0deg', '22.5deg', '45deg', '67.5deg'].map(r => (
+            <View
+              key={r}
+              style={[
+                StyleSheet.absoluteFill,
+                styles.burstRay,
+                {
+                  backgroundColor: fx.kind === 'golden' ? '#fff3a0' : '#ffffff',
+                  borderColor: p.ring,
+                  transform: [{ rotate: r }, { scaleX: 0.42 }],
+                },
+              ]}
+            />
+          ))}
+        </Animated.View>
+      )}
       <Animated.Text
         style={[
           styles.label,
+          styles.labelOutline,
           {
             color: p.text,
-            textShadowColor: fx.kind === 'miss' ? 'transparent' : p.ring,
+            textShadowColor: fx.kind === 'miss' ? 'transparent' : 'rgba(45,10,70,0.95)',
             fontSize: fx.kind === 'miss' ? 18 : fx.kind === 'golden' ? 34 : 28,
             opacity: t.interpolate({ inputRange: [0, 0.65, 1], outputRange: [1, 1, 0] }),
             transform: [
@@ -139,6 +174,8 @@ export function FxLayer({ items, onDone }: { items: Fx[]; onDone: (id: number) =
 const styles = StyleSheet.create({
   abs: { position: 'absolute' },
   anchor: { position: 'absolute', width: 0, height: 0, alignItems: 'center' },
+  burstRay: { borderRadius: 6, borderWidth: 2 },
+  labelOutline: { textShadowOffset: { width: 0, height: 3 } },
   label: {
     position: 'absolute',
     width: 200,

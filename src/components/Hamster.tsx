@@ -17,6 +17,7 @@ export const Hamster = memo(function HamsterView({
   const earInner = golden ? '#ffb347' : colors.pink;
   const bodyW = s * 0.84;
   const eye = s * 0.14;
+  const outline = golden ? 'rgba(150,90,0,0.55)' : 'rgba(110,50,10,0.5)';
 
   return (
     <View style={{ width: s, height: s }}>
@@ -32,6 +33,8 @@ export const Hamster = memo(function HamsterView({
               height: s * 0.28,
               borderRadius: s * 0.14,
               backgroundColor: fur,
+              borderWidth: Math.max(1.5, s * 0.022),
+              borderColor: outline,
             },
           ]}
         >
@@ -66,6 +69,9 @@ export const Hamster = memo(function HamsterView({
             backgroundColor: fur,
             backgroundImage: golden ? gradients.goldFur : gradients.fur,
             overflow: 'hidden',
+            borderWidth: Math.max(1.5, s * 0.022),
+            borderColor: outline,
+            boxShadow: `inset ${-s * 0.07}px ${-s * 0.05}px 0px rgba(120,45,0,0.16), inset ${s * 0.05}px ${s * 0.06}px ${s * 0.08}px rgba(255,255,255,0.35)`,
           },
         ]}
       >
@@ -177,6 +183,25 @@ export const Hamster = memo(function HamsterView({
             ]}
           />
         ))}
+
+        {/* whiskers */}
+        {[-1, 1].map(side =>
+          [-10, 8].map(rot => (
+            <View
+              key={`${side}${rot}`}
+              style={[
+                styles.abs,
+                styles.whisker,
+                {
+                  left: side < 0 ? -s * 0.02 : bodyW - s * 0.2,
+                  top: s * 0.42 + (rot > 0 ? s * 0.05 : 0),
+                  width: s * 0.2,
+                  transform: [{ rotate: `${side * rot}deg` }],
+                },
+              ]}
+            />
+          )),
+        )}
 
         {/* nose */}
         <View
@@ -349,6 +374,7 @@ function StunStars({ size: s }: { size: number }) {
 
 const styles = StyleSheet.create({
   abs: { position: 'absolute' },
+  whisker: { height: 1.2, backgroundColor: 'rgba(90,40,10,0.45)' },
   sparkle: { color: '#fffbe0', textShadowColor: colors.gold, textShadowRadius: 8 },
   star: { color: colors.gold, textShadowColor: '#ff9f1c', textShadowRadius: 6 },
 });

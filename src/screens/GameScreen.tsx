@@ -3,9 +3,7 @@ import {
   Animated,
   Easing,
   Platform,
-  Pressable,
   StyleSheet,
-  Text,
   Vibration,
   View,
   useWindowDimensions,
@@ -14,10 +12,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Fx, FxKind, FxLayer } from '../components/Effects';
 import { HUD } from '../components/HUD';
 import { Hammer, HammerHandle } from '../components/Hammer';
-import { Hole } from '../components/Hole';
-import { FINAL_STRETCH_MS } from '../game/config';
+import { GameField } from '../components/GameField';
+import { FINAL_STRETCH_MS, HOLE_COLS } from '../game/config';
 import { EndReason, GameStats, useGameEngine } from '../game/useGameEngine';
-import { colors, glow, gradients } from '../theme';
+import { colors } from '../theme';
 
 type Props = {
   onGameOver: (stats: GameStats, reason: EndReason) => void;
@@ -30,6 +28,13 @@ const buzz = (pattern: number | number[]) => {
     Vibration.vibrate(pattern);
   }
 };
+
+/** Pick how many rows fit the screen so the field fills the space without squashing holes. */
+function rowsFor(width: number, height: number, top: number, bottom: number) {
+  const cellW = (width - 32 - 16) / HOLE_COLS;
+  const fieldH = height - top - bottom - 8 - 16 - 170 - 12 - 22;
+  return fieldH / (cellW * 1.12) >= 3.6 ? 4 : 3;
+}
 
 export function GameScreen({ onGameOver, onQuit }: Props) {
   const insets = useSafeAreaInsets();
@@ -64,7 +69,8 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
     [onGameOver, showBanner],
   );
 
-  const engine = useGameEngine(handleEnd);
+  const [rows] = useState(() => rowsFor(width, height, insets.top, insets.bottom));
+  const engine = useGameEngine(handleEnd, rows * HOLE_COLS);
   const { start } = engine;
 
   useEffect(() => () => {
@@ -160,11 +166,6 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
     [whack, addFx, doShake, showBanner, flash],
   );
 
-  const fieldPad = 12;
-  const maxByWidth = (width - 32 - fieldPad * 2) / 3;
-  const maxByHeight = (height - insets.top - insets.bottom - 280) / 3;
-  const holeSize = Math.floor(Math.min(maxByWidth, maxByHeight));
-
   const shakeTranslate = useMemo(
     () =>
       Animated.multiply(
@@ -185,42 +186,22 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
         style={[
           styles.content,
           {
-            paddingTop: insets.top + 10,
+            paddingTop: insets.top + 8,
             paddingBottom: insets.bottom + 16,
             transform: [{ translateX: shakeTranslate }],
           },
         ]}
       >
-        <View style={styles.topBar}>
-          <Pressable onPress={onQuit} hitSlop={12} style={styles.quit}>
-            <Text style={styles.quitText}>✕</Text>
-          </Pressable>
-          <Text style={styles.brand}>
-            HAMMER <Text style={{ color: colors.neonPink }}>IT!</Text>
-          </Text>
-          <View style={styles.quitSpacer} />
-        </View>
-
         <HUD
           score={engine.score}
           combo={engine.combo}
           multiplier={engine.multiplier}
           lives={engine.lives}
           timeLeft={engine.timeLeft}
+          onQuit={onQuit}
         />
 
-        <View style={styles.fieldWrap}>
-          <View style={[styles.field, { padding: fieldPad }]}>
-            {[0, 1, 2, 3].map(i => (
-              <View key={i} pointerEvents="none" style={[styles.stripe, { top: `${i * 25 + 6}%` }]} />
-            ))}
-            <View style={[styles.grid, { width: holeSize * 3 }]}>
-              {engine.holes.map((h, i) => (
-                <Hole key={i} index={i} hole={h} size={holeSize} onWhack={onWhack} />
-              ))}
-            </View>
-          </View>
-        </View>
+        <GameField rows={rows} cols={HOLE_COLS} holes={engine.holes} onWhack={onWhack} />
       </Animated.View>
 
       <FxLayer items={fx} onDone={removeFx} />
@@ -255,40 +236,7 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  content: { flex: 1, paddingHorizontal: 16, gap: 14 },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  quit: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.glass,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-  },
-  quitText: { color: colors.text, fontSize: 16, fontWeight: '800' },
-  quitSpacer: { width: 38 },
-  brand: { color: colors.text, fontSize: 20, fontWeight: '900', letterSpacing: 3 },
-  fieldWrap: { flex: 1, justifyContent: 'center' },
-  field: {
-    alignItems: 'center',
-    borderRadius: 32,
-    backgroundColor: '#27b05f',
-    backgroundImage: gradients.field,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.35)',
-    boxShadow: `${glow('rgba(91,227,125,0.45)', 30)}, 0px 18px 30px rgba(0,0,0,0.45)`,
-    overflow: 'hidden',
-  },
-  stripe: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: '12%',
-    backgroundColor: 'rgba(255,255,255,0.07)',
-  },
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  content: { flex: 1, paddingHorizontal: 16, gap: 12 },
   flash: { backgroundColor: 'rgba(255,60,80,0.35)' },
   bannerWrap: { alignItems: 'center', justifyContent: 'center' },
   banner: {

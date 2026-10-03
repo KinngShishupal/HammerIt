@@ -2,7 +2,7 @@ export type HamsterKind = 'normal' | 'golden' | 'bomb';
 
 export const GAME_DURATION_MS = 60_000;
 export const FINAL_STRETCH_MS = 10_000;
-export const HOLE_COUNT = 9;
+export const HOLE_COLS = 3;
 export const MAX_LIVES = 3;
 export const HOLE_COOLDOWN_MS = 320;
 

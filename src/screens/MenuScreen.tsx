@@ -72,7 +72,7 @@ function DemoHole() {
     setHole(h => (h.kind && !h.hit ? { ...h, hit: true } : h));
   }, []);
 
-  return <Hole index={0} hole={hole} size={190} onWhack={onWhack} />;
+  return <Hole index={0} hole={hole} width={200} height={200} onWhack={onWhack} />;
 }
 
 function LegendItem({ children, label, value, color }: { children: React.ReactNode; label: string; value: string; color: string }) {
