@@ -31,6 +31,7 @@ local.properties
 *.iml
 *.hprof
 .cxx/
+.cxx-audio/
 *.keystore
 !debug.keystore
 .kotlin/
@@ -73,3 +74,7 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Release signing & build outputs
+android/keystore.properties
+dist/

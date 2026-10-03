@@ -31,5 +31,11 @@ subprojects { sub ->
             def current = task.environment[pathKey] ?: System.getenv("PATH") ?: ""
             task.environment(pathKey, (gitTools + [current]).join(File.pathSeparator))
         }
+
+        // Its native build nests the full source path under .cxx/RelWithDebInfo/<hash>/<abi>/..., which
+        // overflows Windows' 260-char path limit in release builds. Build it in a shorter folder instead.
+        sub.plugins.withId("com.android.library") {
+            sub.android.externalNativeBuild.cmake.buildStagingDirectory = new File(rootProject.projectDir, ".cxx-audio")
+        }
     }
 }
