@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8c486"/>
+      <stop offset="0.55" stop-color="#e8994f"/>
+      <stop offset="1" stop-color="#c4742f"/>
+    </linearGradient>
+    <linearGradient id="moundTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e2ad70"/>
+      <stop offset="0.5" stop-color="#a8703c"/>
+    </linearGradient>
+    <linearGradient id="hole" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000"/>
+      <stop offset="0.6" stop-color="#140906"/>
+      <stop offset="1" stop-color="#3a1f0e"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0404" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#0a0404" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#0a0404"/>
+    </linearGradient>
+    <linearGradient id="mallet" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8a80"/>
+      <stop offset="0.45" stop-color="#ff4d5e"/>
+      <stop offset="1" stop-color="#b3124f"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6b7280"/>
+      <stop offset="0.4" stop-color="#f3f4f6"/>
+      <stop offset="0.7" stop-color="#9ca3af"/>
+      <stop offset="1" stop-color="#4b5563"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8b47a"/>
+      <stop offset="0.55" stop-color="#b0723a"/>
+      <stop offset="1" stop-color="#7a4a22"/>
+    </linearGradient>
+    <clipPath id="aboveHole"><rect x="0" y="0" width="1024" height="790"/></clipPath>
+  </defs>
+
+  <!-- mound -->
+  <ellipse cx="512" cy="860" rx="410" ry="120" fill="#2a1408" opacity="0.35"/>
+  <ellipse cx="512" cy="835" rx="395" ry="118" fill="#5c3416"/>
+  <ellipse cx="512" cy="805" rx="395" ry="118" fill="url(#moundTop)"/>
+  <ellipse cx="512" cy="785" rx="285" ry="86" fill="url(#hole)"/>
+
+  <!-- hamster -->
+  <g clip-path="url(#aboveHole)">
+    <g stroke="#6e320a" stroke-opacity="0.55" stroke-width="12">
+      <circle cx="378" cy="345" r="74" fill="#e8994f"/>
+      <circle cx="646" cy="345" r="74" fill="#e8994f"/>
+    </g>
+    <circle cx="378" cy="345" r="44" fill="#ff9eb5"/>
+    <circle cx="646" cy="345" r="44" fill="#ff9eb5"/>
+    <path d="M318,900 V530 A194,194 0 0 1 706,530 V900 Z" fill="url(#fur)" stroke="#6e320a" stroke-opacity="0.55" stroke-width="12"/>
+    <path d="M360,470 Q380,390 450,368" stroke="#ffffff" stroke-opacity="0.45" stroke-width="22" stroke-linecap="round" fill="none"/>
+    <ellipse cx="512" cy="735" rx="128" ry="150" fill="#ffe7c7"/>
+    <!-- eyes -->
+    <circle cx="440" cy="530" r="38" fill="#1a0f0a"/>
+    <circle cx="584" cy="530" r="38" fill="#1a0f0a"/>
+    <circle cx="428" cy="516" r="14" fill="#fff"/>
+    <circle cx="572" cy="516" r="14" fill="#fff"/>
+    <circle cx="452" cy="546" r="6" fill="#fff" opacity="0.8"/>
+    <circle cx="596" cy="546" r="6" fill="#fff" opacity="0.8"/>
+    <!-- cheeks, nose, teeth, whiskers -->
+    <ellipse cx="388" cy="612" rx="46" ry="28" fill="#ff7aa2" opacity="0.6"/>
+    <ellipse cx="636" cy="612" rx="46" ry="28" fill="#ff7aa2" opacity="0.6"/>
+    <ellipse cx="512" cy="598" rx="24" ry="16" fill="#ff5f8f"/>
+    <rect x="493" y="618" width="17" height="30" rx="5" fill="#fff"/>
+    <rect x="514" y="618" width="17" height="30" rx="5" fill="#fff"/>
+    <g stroke="#5a280a" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round">
+      <line x1="300" y1="600" x2="370" y2="608"/><line x1="304" y1="636" x2="372" y2="626"/>
+      <line x1="724" y1="600" x2="654" y2="608"/><line x1="720" y1="636" x2="652" y2="626"/>
+    </g>
+    <rect x="326" y="722" width="372" height="70" fill="url(#fade)"/>
+  </g>
+  <!-- paws on the rim -->
+  <g fill="#e8994f" stroke="#6e320a" stroke-opacity="0.55" stroke-width="8">
+    <ellipse cx="430" cy="800" rx="44" ry="26"/>
+    <ellipse cx="594" cy="800" rx="44" ry="26"/>
+  </g>
+  <g stroke="#6e320a" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round">
+    <line x1="420" y1="782" x2="420" y2="800"/><line x1="440" y1="782" x2="440" y2="800"/>
+    <line x1="584" y1="782" x2="584" y2="800"/><line x1="604" y1="782" x2="604" y2="800"/>
+  </g>
+
+  <!-- impact burst -->
+  <path transform="translate(640 250) scale(1.3)" fill="#fff3a0" d="M0,-50 C6,-12 12,-6 50,0 C12,6 6,12 0,50 C-6,12 -12,6 -50,0 C-12,-6 -6,-12 0,-50 Z"/>
+  <path transform="translate(250 300) scale(0.8)" fill="#ffffff" d="M0,-50 C6,-12 12,-6 50,0 C12,6 6,12 0,50 C-6,12 -12,6 -50,0 C-12,-6 -6,-12 0,-50 Z"/>
+  <path transform="translate(800 520) scale(0.7)" fill="#ffffff" d="M0,-50 C6,-12 12,-6 50,0 C12,6 6,12 0,50 C-6,12 -12,6 -50,0 C-12,-6 -6,-12 0,-50 Z"/>
+  <g stroke="#fff3a0" stroke-width="16" stroke-linecap="round">
+    <line x1="560" y1="250" x2="530" y2="200"/>
+    <line x1="700" y1="330" x2="760" y2="320"/>
+  </g>
+
+  <!-- mallet, mid-swing -->
+  <g transform="translate(770 255) rotate(-32)">
+    <rect x="60" y="-28" width="400" height="56" rx="28" fill="url(#wood)" stroke="#5c3416" stroke-opacity="0.5" stroke-width="8"/>
+    <rect x="350" y="-28" width="110" height="56" rx="28" fill="#2a1a3d"/>
+    <rect x="350" y="-28" width="14" height="56" fill="#8b5cff"/>
+    <rect x="-82" y="-125" width="164" height="250" rx="40" fill="url(#mallet)" stroke="#7a0f35" stroke-opacity="0.5" stroke-width="8"/>
+    <rect x="-82" y="-92" width="164" height="32" fill="url(#metal)"/>
+    <rect x="-82" y="60" width="164" height="32" fill="url(#metal)"/>
+    <rect x="-55" y="-45" width="22" height="90" rx="11" fill="#ffffff" opacity="0.5"/>
+  </g>
+</svg>
