@@ -1,4 +1,4 @@
-package com.hammerit
+package com.kinngshishupal.hammerit
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

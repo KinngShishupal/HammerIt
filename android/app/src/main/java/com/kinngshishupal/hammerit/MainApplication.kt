@@ -1,4 +1,4 @@
-package com.hammerit
+package com.kinngshishupal.hammerit
 
 import android.app.Application
 import com.facebook.react.PackageList
