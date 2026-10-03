@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
+import { sound } from '../audio/sound';
 import type { HamsterKind } from '../game/config';
 import type { HoleState } from '../game/useGameEngine';
 import { colors, glow } from '../theme';
@@ -14,6 +15,8 @@ type Props = {
   width: number;
   height: number;
   onWhack: (index: number, x: number, y: number) => void;
+  /** Play pop-up cues (off for the menu's demo hole). */
+  sounds?: boolean;
 };
 
 const MOUND_TOP = '#a8703c';
@@ -39,7 +42,7 @@ function Ellipse({ cx, cy, w, ratio, style }: { cx: number; cy: number; w: numbe
   );
 }
 
-export const Hole = memo(function HoleView({ index, hole, width, height, onWhack }: Props) {
+export const Hole = memo(function HoleView({ index, hole, width, height, onWhack, sounds = true }: Props) {
   const rise = useRef(new Animated.Value(0)).current;
   const squash = useRef(new Animated.Value(1)).current;
   const [shown, setShown] = useState<HamsterKind | null>(null);
@@ -47,6 +50,9 @@ export const Hole = memo(function HoleView({ index, hole, width, height, onWhack
 
   useEffect(() => {
     if (hole.kind) {
+      if (sounds) {
+        sound.popUp(hole.kind);
+      }
       setShown(hole.kind);
       setStunned(false);
       squash.setValue(1);
@@ -59,6 +65,7 @@ export const Hole = memo(function HoleView({ index, hole, width, height, onWhack
         useNativeDriver: true,
       }).start();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to new spawns
   }, [hole.kind, hole.spawnId, rise, squash]);
 
   useEffect(() => {
@@ -133,7 +140,7 @@ export const Hole = memo(function HoleView({ index, hole, width, height, onWhack
         <View
           style={[
             styles.fade,
-            { left: (width - hs * 1.04) / 2, width: hs * 1.04, height: s * 0.15, borderRadius: hs * 0.2 },
+            { left: (width - hs * 1.04) / 2, width: hs * 1.04, height: s * 0.1, borderRadius: hs * 0.2 },
           ]}
         />
       </View>
@@ -158,7 +165,7 @@ export const Hole = memo(function HoleView({ index, hole, width, height, onWhack
               styles.paw,
               {
                 left: cx + side * pawDX - pawW / 2,
-                top: frontEdgeAt(pawDX) - pawH * 0.6,
+                top: Math.min(frontEdgeAt(pawDX), clipBottom + b * 0.25) - pawH * 0.75,
                 width: pawW,
                 height: pawH,
                 borderRadius: pawH / 2,
@@ -202,7 +209,7 @@ const styles = StyleSheet.create({
   fade: {
     position: 'absolute',
     bottom: 0,
-    backgroundImage: 'linear-gradient(180deg, rgba(10,4,4,0) 0%, rgba(10,4,4,0.85) 65%, #0a0404 100%)',
+    backgroundImage: 'linear-gradient(180deg, rgba(10,4,4,0) 0%, rgba(10,4,4,0.6) 45%, #0a0404 85%)',
   },
   frontEdge: { borderRadius: 999, backgroundColor: 'rgba(255,225,180,0.4)' },
   paw: {

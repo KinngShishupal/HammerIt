@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { sound } from '../audio/sound';
 import { Bomb } from '../components/Bomb';
 import { GlowButton } from '../components/GlowButton';
 import { Hamster } from '../components/Hamster';
@@ -72,7 +73,7 @@ function DemoHole() {
     setHole(h => (h.kind && !h.hit ? { ...h, hit: true } : h));
   }, []);
 
-  return <Hole index={0} hole={hole} width={200} height={200} onWhack={onWhack} />;
+  return <Hole index={0} hole={hole} width={200} height={200} onWhack={onWhack} sounds={false} />;
 }
 
 function LegendItem({ children, label, value, color }: { children: React.ReactNode; label: string; value: string; color: string }) {
@@ -85,7 +86,18 @@ function LegendItem({ children, label, value, color }: { children: React.ReactNo
   );
 }
 
+function AudioToggle({ icon, on, onToggle }: { icon: string; on: boolean; onToggle: () => void }) {
+  return (
+    <Pressable onPress={onToggle} hitSlop={8} style={[styles.toggle, !on && styles.toggleOff]}>
+      <Text style={[styles.toggleIcon, !on && styles.toggleIconOff]}>{icon}</Text>
+      {!on && <View style={styles.toggleSlash} />}
+    </Pressable>
+  );
+}
+
 export function MenuScreen({ best, onPlay }: Props) {
+  const [musicOn, setMusicOn] = useState(sound.musicEnabled);
+  const [sfxOn, setSfxOn] = useState(sound.sfxEnabled);
   const insets = useSafeAreaInsets();
   const enter = useRef(new Animated.Value(0)).current;
 
@@ -95,6 +107,25 @@ export function MenuScreen({ best, onPlay }: Props) {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
+      <View style={[styles.toggles, { top: insets.top + 10 }]}>
+        <AudioToggle
+          icon="♫"
+          on={musicOn}
+          onToggle={() => {
+            sound.setMusicEnabled(!musicOn);
+            setMusicOn(!musicOn);
+          }}
+        />
+        <AudioToggle
+          icon="🔊"
+          on={sfxOn}
+          onToggle={() => {
+            sound.setSfxEnabled(!sfxOn);
+            setSfxOn(!sfxOn);
+            sound.click();
+          }}
+        />
+      </View>
       <Animated.View
         style={[
           styles.header,
@@ -138,6 +169,28 @@ export function MenuScreen({ best, onPlay }: Props) {
 const styles = StyleSheet.create({
   root: { flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 },
   header: { alignItems: 'center' },
+  toggles: { position: 'absolute', right: 16, flexDirection: 'row', gap: 10, zIndex: 2 },
+  toggle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.glass,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  toggleOff: { opacity: 0.55 },
+  toggleIcon: { color: colors.text, fontSize: 18, fontWeight: '800' },
+  toggleIconOff: { color: colors.textDim },
+  toggleSlash: {
+    position: 'absolute',
+    width: 28,
+    height: 2.5,
+    borderRadius: 2,
+    backgroundColor: colors.danger,
+    transform: [{ rotate: '-45deg' }],
+  },
   kicker: { color: colors.neonCyan, fontWeight: '800', letterSpacing: 6, fontSize: 13, marginBottom: 6 },
   titleRow: { flexDirection: 'row' },
   title: { fontSize: 64, fontWeight: '900', textShadowRadius: 18, lineHeight: 84, paddingHorizontal: 8, marginHorizontal: -6 },

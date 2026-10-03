@@ -19,3 +19,17 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// react-native-audio-api downloads prebuilt binaries with Git Bash on Windows, but starts bash.exe
+// without Git's tools (mkdir, curl, unzip, rm) on PATH, so the script fails. Prepend them here.
+subprojects { sub ->
+    if (sub.name == "react-native-audio-api" && System.getProperty("os.name").toLowerCase().contains("windows")) {
+        sub.tasks.matching { it.name == "downloadPrebuiltBinaries" }.configureEach { task ->
+            def git = new File(System.getenv("ProgramFiles") ?: "C:/Program Files", "Git")
+            def gitTools = [new File(git, "usr/bin").path, new File(git, "mingw64/bin").path]
+            def pathKey = task.environment.keySet().find { it.equalsIgnoreCase("PATH") } ?: "PATH"
+            def current = task.environment[pathKey] ?: System.getenv("PATH") ?: ""
+            task.environment(pathKey, (gitTools + [current]).join(File.pathSeparator))
+        }
+    }
+}

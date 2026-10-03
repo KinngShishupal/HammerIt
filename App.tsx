@@ -4,9 +4,10 @@
  * @format
  */
 
-import React, { useCallback, useState } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { AppState, StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { sound } from './src/audio/sound';
 import { Background } from './src/components/Background';
 import type { EndReason, GameStats } from './src/game/useGameEngine';
 import { GameOverScreen } from './src/screens/GameOverScreen';
@@ -27,6 +28,24 @@ function App() {
     setRound(r => r + 1);
     setScreen({ name: 'game', round: round + 1 });
   }, [round]);
+
+  // The game screen drives its own music (silent countdown, then the game track).
+  useEffect(() => {
+    sound.setMusic(screen.name === 'game' ? 'off' : 'menu');
+  }, [screen.name]);
+
+  useEffect(() => () => sound.setMusic('off'), []);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        sound.resume();
+      } else if (state === 'background') {
+        sound.suspend();
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   const menu = useCallback(() => setScreen({ name: 'menu' }), []);
 

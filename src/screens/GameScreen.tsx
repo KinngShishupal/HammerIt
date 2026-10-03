@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { sound } from '../audio/sound';
 import { Fx, FxKind, FxLayer } from '../components/Effects';
 import { HUD } from '../components/HUD';
 import { Hammer, HammerHandle } from '../components/Hammer';
@@ -63,6 +64,8 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
   const handleEnd = useCallback(
     (reason: EndReason, stats: GameStats) => {
       showBanner(reason === 'time' ? "TIME'S UP!" : 'KABOOM!');
+      sound.setMusic('off');
+      sound.gameOver(reason);
       buzz([0, 60, 60, 60]);
       endTimer.current = setTimeout(() => onGameOver(stats, reason), 1500);
     },
@@ -86,6 +89,10 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
     }
     bannerAnim.setValue(0);
     Animated.spring(bannerAnim, { toValue: 1, speed: 16, bounciness: 16, useNativeDriver: true }).start();
+    sound.countdown(countdown === 0);
+    if (countdown === 0) {
+      sound.setMusic('game');
+    }
     const t = setTimeout(
       () => {
         if (countdown > 0) {
@@ -104,10 +111,18 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
     if (engine.running && !finalStretchShown.current && engine.timeLeft <= FINAL_STRETCH_MS) {
       finalStretchShown.current = true;
       showBanner('FINAL 10s!');
+      sound.setIntensity(true);
       const t = setTimeout(() => setBanner(b => (b === 'FINAL 10s!' ? null : b)), 1000);
       return () => clearTimeout(t);
     }
   }, [engine.running, engine.timeLeft, showBanner]);
+
+  const secondsLeft = Math.ceil(engine.timeLeft / 1000);
+  useEffect(() => {
+    if (engine.running && secondsLeft <= FINAL_STRETCH_MS / 1000 && secondsLeft > 0) {
+      sound.tick(secondsLeft <= 3);
+    }
+  }, [engine.running, secondsLeft]);
 
   const doShake = useCallback(
     (intensity: number) => {
@@ -136,9 +151,15 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
         return;
       }
       hammer.current?.strike(x, y);
+      sound.swing();
       switch (r.type) {
         case 'hit': {
           const golden = r.kind === 'golden';
+          if (golden) {
+            sound.hitGolden();
+          } else {
+            sound.hitHamster(r.combo);
+          }
           addFx(x, y, golden ? 'golden' : 'hit', `+${r.points}`);
           buzz(golden ? 45 : 18);
           if (golden) {
@@ -146,12 +167,14 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
           }
           if (r.combo > 0 && r.combo % 5 === 0 && r.multiplier <= 5) {
             showBanner(r.multiplier >= 5 ? 'MAX COMBO!' : `COMBO x${r.multiplier}!`);
+            sound.comboUp(r.multiplier);
             setTimeout(() => setBanner(b => (b?.includes('COMBO') ? null : b)), 800);
           }
           break;
         }
         case 'bomb':
           addFx(x, y, 'bomb', '-1 ♥');
+          sound.hitBomb();
           buzz([0, 90, 40, 140]);
           doShake(1.6);
           flash.setValue(1);
@@ -159,6 +182,7 @@ export function GameScreen({ onGameOver, onQuit }: Props) {
           break;
         case 'miss':
           addFx(x, y, 'miss', 'MISS');
+          sound.miss();
           buzz(8);
           break;
       }

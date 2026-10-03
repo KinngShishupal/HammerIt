@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text } from 'react-native';
+import { sound } from '../audio/sound';
 import { colors, glow, gradients } from '../theme';
 
 type Props = {
@@ -33,7 +34,14 @@ export function GlowButton({ title, onPress, variant = 'primary', pulse }: Props
   const primary = variant === 'primary';
 
   return (
-    <Pressable onPressIn={() => to(0.93)} onPressOut={() => to(1)} onPress={onPress}>
+    <Pressable
+      onPressIn={() => {
+        sound.click();
+        to(0.93);
+      }}
+      onPressOut={() => to(1)}
+      onPress={onPress}
+    >
       <Animated.View
         style={[
           styles.base,

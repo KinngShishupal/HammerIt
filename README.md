@@ -25,3 +25,20 @@ src/screens/               MenuScreen, GameScreen, GameOverScreen
 
 Every visual is drawn with Views, CSS gradients (`backgroundImage`) and `boxShadow`, then animated with the
 built-in `Animated` API on the native driver, so the game needs no extra native libraries.
+
+## Audio
+All sound effects and music are synthesized at runtime with
+[react-native-audio-api](https://github.com/software-mansion/react-native-audio-api), the Web Audio API for
+React Native, in `src/audio/sound.ts`. There are no audio files.
+- Different hit sounds: hamster (bonk plus a squeak whose pitch climbs with the combo), golden (bonk, coin
+  ka-ching and a sparkle arpeggio), bomb (sub-bass boom with a noise blast), miss (thud on the dirt), plus a
+  swing whoosh on every tap.
+- Pop-up cues when something appears, countdown beeps, combo jingles, clock ticks in the last 10 seconds,
+  game-over jingles and a new-best fanfare.
+- A chiptune soundtrack in A minor: a calm menu version, and a full game version that speeds up for the
+  final stretch. Music and SFX toggles are on the menu.
+
+**Windows build note:** the audio library downloads prebuilt binaries with Git Bash during the Gradle build.
+`android/build.gradle` puts Git's tools on that task's PATH, so `npm run android` works as is. It needs Git for
+Windows installed in the default location. Run it from PowerShell or cmd; from Git Bash the CLI can't start
+`gradlew.bat`.

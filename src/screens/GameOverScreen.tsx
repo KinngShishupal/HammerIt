@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { sound } from '../audio/sound';
 import { GlowButton } from '../components/GlowButton';
 import { Hamster } from '../components/Hamster';
 import { rankFor } from '../game/config';
@@ -51,10 +52,13 @@ export function GameOverScreen({ stats, reason, best, isNewBest, onPlayAgain, on
       easing: Easing.out(Easing.cubic),
       useNativeDriver: false,
     }).start(() => {
+      if (isNewBest) {
+        sound.fanfare();
+      }
       Animated.spring(badge, { toValue: 1, speed: 10, bounciness: 16, useNativeDriver: true }).start();
     });
     return () => count.removeListener(id);
-  }, [count, badge, stats.score]);
+  }, [count, badge, stats.score, isNewBest]);
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 32, paddingBottom: insets.bottom + 28 }]}>
